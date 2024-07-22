@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ 
+  <title> Text Editor </title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    select, textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .font-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .font-controls select {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .font-controls label {
+      margin-right: 10px;
+    }
+    #editor {
+      height: 300px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-family: Arial, sans-serif; 
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .button-container {
+      display: flex;
+      justify-content: flex-end; 
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="font-controls">
+    <label for="fontFamily">Select Font Family:</label>
+    <select id="fontFamily">
+      <option value="Arial, sans-serif">ABeeZee</option>
+      <option value="Georgia, serif">Aboreto</option>
+      <option value="Helvetica, sans-serif">Helvetica</option>
+      <option value="Times New Roman, serif">Times New Roman</option>
+      <option value="Courier New, monospace">Courier New</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Garamond, serif">Garamond</option>
+      <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+      <option value="Comic Sans MS, cursive">Comic Sans MS</option>
+    </select>
+
+    <label for="fontWeight">Variant:</label>
+    <select id="fontWeight">
+      <option value="normal">Normal</option>
+      <option value="bold">Bold</option>
+      
+    </select>
+
+    <label for="italicCheckbox">
+      <input type="checkbox" id="italicCheckbox"> Italic
+    </label>
+  </div>
+
+  <div>
+    <label for="editor">Enter Text:</label>
+    <textarea id="editor" placeholder="Type your text here..."></textarea>
+  </div>
+
+  <div class="button-container">
+    <button id="saveBtn">Save</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const fontFamilySelector = document.getElementById('fontFamily');
+      const fontWeightSelector = document.getElementById('fontWeight');
+      const italicCheckbox = document.getElementById('italicCheckbox');
+      const editor = document.getElementById('editor');
+      const saveBtn = document.getElementById('saveBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+     
+      function setEditorFontStyle(fontFamily, fontWeight, isItalic) {
+        editor.style.fontFamily = fontFamily;
+        editor.style.fontWeight = fontWeight;
+        editor.style.fontStyle = isItalic ? 'italic' : 'normal';
+      }
+
+     
+      fontFamilySelector.addEventListener('change', function() {
+        const selectedFamily = fontFamilySelector.value;
+        const selectedWeight = fontWeightSelector.value;
+        const selectedItalic = italicCheckbox.checked;
+
+       
+        const fontVariants = getFontVariants(selectedFamily);
+        let selectedVariant = { weight: selectedWeight, italic: selectedItalic };
+        selectedVariant = findClosestVariant(fontVariants, selectedVariant);
+
+       
+        updateFontWeightSelector(fontVariants);
+
+       
+        setEditorFontStyle(selectedFamily, selectedVariant.weight, selectedVariant.italic);
+      });
+
+      
+      fontWeightSelector.addEventListener('change', function() {
+        const selectedFamily = fontFamilySelector.value;
+        const selectedWeight = fontWeightSelector.value;
+        const selectedItalic = italicCheckbox.checked;
+
+       
+        const fontVariants = getFontVariants(selectedFamily);
+        let selectedVariant = { weight: selectedWeight, italic: selectedItalic };
+        selectedVariant = findClosestVariant(fontVariants, selectedVariant);
+
+        
+        setEditorFontStyle(selectedFamily, selectedVariant.weight, selectedVariant.italic);
+      });
+
+      italicCheckbox.addEventListener('change', function() {
+        const selectedFamily = fontFamilySelector.value;
+        const selectedWeight = fontWeightSelector.value;
+        const isItalic = italicCheckbox.checked;
+
+        const fontVariants = getFontVariants(selectedFamily);
+        let selectedVariant = { weight: selectedWeight, italic: isItalic };
+        selectedVariant = findClosestVariant(fontVariants, selectedVariant);
+
+        setEditorFontStyle(selectedFamily, selectedVariant.weight, selectedVariant.italic);
+      });
+
+      saveBtn.addEventListener('click', function() {
+        const textContent = editor.value;
+        localStorage.setItem('textEditorContent', textContent);
+        alert('Text saved!');
+      });
+
+      resetBtn.addEventListener('click', function() {
+        editor.value = '';
+        editor.style.fontFamily = '';
+        editor.style.fontWeight = '';
+        editor.style.fontStyle = 'normal';
+        localStorage.removeItem('textEditorContent');
+        alert('Text cleared!');
+      });
+
+      const savedContent = localStorage.getItem('textEditorContent');
+      if (savedContent) {
+        editor.value = savedContent;
+      }
+
+      function getFontVariants(fontFamily) {
+        switch (fontFamily) {
+          case "Arial, sans-serif":
+            return [{ weight: 'normal' }, { weight: 'bold' }, { weight: 'normal', italic: true }];
+          case "Georgia, serif":
+            return [{ weight: 'normal' }, { weight: 'bold' }];
+          case "Helvetica, sans-serif":
+            return [{ weight: 'normal' }, { weight: 'bold' }, { weight: 'normal', italic: true }];
+          case "Times New Roman, serif":
+            return [{ weight: 'normal' }, { weight: 'bold' }, { weight: 'normal', italic: true }];
+          case "Courier New, monospace":
+            return [{ weight: 'normal' }, { weight: 'bold' }];
+          case "Verdana, sans-serif":
+            return [{ weight: 'normal' }, { weight: 'bold' }, { weight: 'normal', italic: true }];
+          case "Garamond, serif":
+            return [{ weight: 'Extra-Bold' }, { weight: 'bold' }];
+          case "Trebuchet MS, sans-serif":
+            return [{ weight: 'normal' }, { weight: 'bold' }];
+          case "Comic Sans MS, cursive":
+            return [{ weight: 'Semi-Bold' }, { weight: 'bold' }, { weight: 'normal', italic: true }];
+          default:
+            return [];
+        }
+      }
+
+      function findClosestVariant(variants, selectedVariant) {
+        const selectedWeight = selectedVariant.weight;
+        const selectedItalic = selectedVariant.italic || false;
+
+        
+        const selectedExists = variants.some(variant =>
+          variant.weight === selectedWeight && variant.italic === selectedItalic
+        );
+
+        if (selectedExists) {
+          return selectedVariant; 
+        }
+
+        if (selectedItalic) {
+          const closestItalic = variants.find(variant => variant.italic);
+          if (closestItalic) {
+            return closestItalic;
+          }
+        }
+
+        const closestWeight = variants.reduce((closest, variant) => {
+          const weightDiff = Math.abs(getWeightValue(variant.weight) - getWeightValue(selectedWeight));
+          if (weightDiff < Math.abs(getWeightValue(closest.weight) - getWeightValue(selectedWeight))) {
+            return variant;
+          }
+          return closest;
+        });
+
+        return closestWeight;
+      }
+
+      function updateFontWeightSelector(variants) {
+        const weights = variants.map(variant => variant.weight);
+        const uniqueWeights = [...new Set(weights)]; 
+        fontWeightSelector.innerHTML = ''; 
+
+        uniqueWeights.forEach(weight => {
+          const option = document.createElement('option');
+          option.value = weight;
+          option.textContent = weight.charAt(0).toUpperCase() + weight.slice(1); 
+          fontWeightSelector.appendChild(option);
+        });
+      }
+
+      function getWeightValue(weight) {
+        switch (weight) {
+          case 'normal': return 400;
+          case 'bold': return 700;
+          default: return parseInt(weight) || 400;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
